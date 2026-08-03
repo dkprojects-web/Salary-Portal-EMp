@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Salary Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #e94560;
+            --gold: #f0a500;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .card {
+            background: rgba(26, 26, 46, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(240, 165, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .card-header i {
+            font-size: 50px;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .card-header h3 {
+            color: white;
+            font-weight: 700;
+            margin: 10px 0 5px;
+        }
+
+        .card-header p {
+            color: var(--gold);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .form-label {
+            color: #e0e0e0;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid #2a2a4a;
+            background: rgba(15, 15, 30, 0.8);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-verify {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #f0a500, #e94560);
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 83, 0.2);
+            border: 1px solid #00c853;
+            color: #00c853;
+        }
+
+        .alert-danger {
+            background: rgba(255, 23, 68, 0.2);
+            border: 1px solid #ff1744;
+            color: #ff1744;
+        }
+
+        .alert-info {
+            background: rgba(0, 188, 212, 0.2);
+            border: 1px solid #00bcd4;
+            color: #00bcd4;
+        }
+
+        .employee-info {
+            background: rgba(240, 165, 0, 0.1);
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .employee-info p {
+            color: white;
+            margin: 5px 0;
+        }
+
+        .employee-info strong {
+            color: var(--gold);
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .salary-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .salary-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2a2a4a;
+            color: #e0e0e0;
+        }
+
+        .salary-table tr:hover td {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .total-row {
+            background: rgba(240, 165, 0, 0.1);
+            font-weight: 700;
+            color: var(--gold) !important;
+        }
+
+        .grand-total {
+            background: linear-gradient(135deg, #f0a500, #e94560);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            margin-top: 15px;
+        }
+
+        .btn-back:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .section-title {
+            color: var(--gold);
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--gold);
+        }
+
+        .loading i {
+            font-size: 30px;
+            animation: spin 1s infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media print {
+            body {
+                background: white !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: none !important;
+            }
+            .btn, .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i>
+            <p id="loadingText">Loading...</p>
+        </div>
+
+        <!-- Login Screen -->
+        <div class="card" id="loginCard">
+            <div class="card-header">
+                <i class="fas fa-gem"></i>
+                <h3>Salary Slip Portal</h3>
+                <p>Diamond Enterprise</p>
+            </div>
+            <div class="card-body">
+                <div id="message"></div>
+                
+                <label class="form-label">Select Department</label>
+                <select id="dept" class="form-select">
+                    <option value="">-- Choose Department --</option>
+                </select>
+
+                <label class="form-label">Enter PAN Number</label>
+                <input type="text" id="pan" class="form-control" 
+                       maxlength="10" placeholder="ABCDE1234F" autocomplete="off">
+
+                <button class="btn btn-verify" onclick="verifyPAN()">
+                    <i class="fas fa-search"></i> Verify PAN
+                </button>
+
+                <div id="verifiedSection" style="display:none;">
+                    <div class="employee-info" id="employeeInfo"></div>
+                    
+                    <label class="form-label">Select Month</label>
+                    <select id="month" class="form-select">
+                        <option value="">-- Choose Month --</option>
+                    </select>
+
+                    <button class="btn btn-login" id="viewBtn" disabled onclick="viewSalary()">
+                        <i class="fas fa-eye"></i> View Salary Slip
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salary View -->
+        <div id="salaryCard" style="display:none; width:100%; max-width:1000px;">
+            <div class="card">
+                <div class="card-header">
+                    <h3>📋 Salary Slip</h3>
+                    <p id="slipDate"></p>
+                </div>
+                <div class="card-body">
+                    <div id="salaryContent"></div>
+                    <button class="btn btn-back no-print" onclick="goBack()">
+                        <i class="fas fa-arrow-left"></i> Back to Login
+                    </button>
+                    <button class="btn btn-verify no-print" style="margin-top:10px;" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print Salary Slip
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURATION - Apna Supabase URL yahan dalen
+        const SUPABASE_URL = 'https://jeofxxumyoiaqggblggj.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_uDkMJr191UEjs__tahpHMw_ipl72MwZ';
+        const API_URL = SUPABASE_URL + '/functions/v1/salary-api';
+
+        let currentEmployee = null;
+
+        // Page load hone pe departments load karo
+        window.onload = async function() {
+            showLoading('Loading departments...');
+            try {
+                const response = await fetch(API_URL + '/departments', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const deptSelect = document.getElementById('dept');
+                    data.departments.forEach(dept => {
+                        deptSelect.innerHTML += `<option value="${dept.code}">${dept.name || dept.code}</option>`;
+                    });
+                }
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showMessage('Failed to load. Please refresh page.', 'danger');
+            }
+        };
+
+        // PAN auto uppercase
+        document.getElementById('pan').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Verify PAN Button
+        async function verifyPAN() {
+            const dept = document.getElementById('dept').value;
+            const pan = document.getElementById('pan').value.trim();
+
+            if (!dept) {
+                showMessage('Please select department', 'danger');
+                return;
+            }
+            if (!pan || pan.length !== 10) {
+                showMessage('Please enter valid 10-digit PAN', 'danger');
+                return;
+            }
+
+            showLoading('Verifying PAN...');
+            
+            try {
+                const response = await fetch(API_URL + '/verify-employee', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({dept, pan})
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentEmployee = {
+                        dept: dept,
+                        pan: pan,
+                        name: data.name,
+                        code: data.code
+                    };
+
+                    document.getElementById('employeeInfo').innerHTML = `
+                        <p><strong>👤 Name:</strong> ${data.name}</p>
+                        <p><strong>🆔 Code:</strong> ${data.code || 'N/A'}</p>
+                        <p><strong>💳 PAN:</strong> ${pan}</p>
+                    `;
+
+                    const monthSelect = document.getElementById('month');
+                    monthSelect.innerHTML = '<option value="">-- Choose Month --</option>';
+                    data.months.forEach(m => {
+                        monthSelect.innerHTML += `<option value="${m}">${m}</option>`;
+                    });
+
+                    document.getElementById('verifiedSection').style.display = 'block';
+                    showMessage(`✅ Verified! ${data.months.length} months available`, 'success');
+                } else {
+                    showMessage('❌ ' + data.message, 'danger');
+                }
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showMessage('Network error. Please try again.', 'danger');
+            }
+        }
+
+        // Enable view button when month selected
+        document.getElementById('month').addEventListener('change', function() {
+            document.getElementById('viewBtn').disabled = !this.value;
+        });
+
+        // View Salary Button
+        async function viewSalary() {
+            const month = document.getElementById('month').value;
+            if (!month || !currentEmployee) return;
+
+            showLoading('Loading salary slip...');
+
+            try {
+                const response = await fetch(API_URL + '/get-salary', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        dept: currentEmployee.dept,
+                        pan: currentEmployee.pan,
+                        month: month
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    displaySalary(data);
+                } else {
+                    showMessage('❌ ' + data.message, 'danger');
+                }
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showMessage('Network error. Please try again.', 'danger');
+            }
+        }
+
+        // Display Salary Slip
+        function displaySalary(data) {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('salaryCard').style.display = 'block';
+            document.getElementById('slipDate').textContent = 'Generated: ' + data.employee.generatedAt;
+
+            let html = `
+                <div class="employee-info">
+                    <p><strong>👤 Name:</strong> ${data.employee.name}</p>
+                    <p><strong>🏢 Department:</strong> ${data.employee.department}</p>
+                    <p><strong>💳 PAN:</strong> ${data.employee.pan}</p>
+                    <p><strong>📅 Month:</strong> ${data.employee.month}</p>
+                    ${data.employee.code ? `<p><strong>🆔 Code:</strong> ${data.employee.code}</p>` : ''}
+                </div>
+            `;
+
+            // Main Section
+            if (data.main.rows && data.main.rows.length > 0) {
+                html += `<h4 class="section-title">📋 Full Process (Main)</h4>`;
+                html += buildTable(data.main);
+            }
+
+            // Uchak Section
+            if (data.uchak.rows && data.uchak.rows.length > 0) {
+                html += `<h4 class="section-title">📋 Uchak Process</h4>`;
+                html += buildTable(data.uchak);
+            }
+
+            // Grand Total
+            html += `
+                <div class="grand-total">
+                    💰 Grand Total: ₹${data.grandTotal.toLocaleString('en-IN')}
+                </div>
+            `;
+
+            document.getElementById('salaryContent').innerHTML = html;
+            window.scrollTo(0, 0);
+        }
+
+        function buildTable(sectionData) {
+            if (!sectionData.rows || sectionData.rows.length === 0) return '<p>No records</p>';
+
+            // Get all column headers
+            const headers = new Set();
+            sectionData.rows.forEach(row => {
+                Object.keys(row).forEach(key => {
+                    if (!key.startsWith('_') && key !== 'month') {
+                        headers.add(key);
+                    }
+                });
+            });
+
+            const headerArray = Array.from(headers);
+
+            let table = '<div style="overflow-x:auto;"><table class="salary-table">';
+            
+            // Header
+            table += '<thead><tr>';
+            headerArray.forEach(h => table += `<th>${h}</th>`);
+            table += '</tr></thead>';
+
+            // Body
+            table += '<tbody>';
+            sectionData.rows.forEach(row => {
+                table += '<tr>';
+                headerArray.forEach(h => {
+                    let value = row[h] || '-';
+                    if (typeof value === 'number') {
+                        if (h.toLowerCase().includes('amount') || h.toLowerCase().includes('rate')) {
+                            value = '₹' + value.toLocaleString('en-IN');
+                        } else if (h.toLowerCase().includes('carat')) {
+                            value = value.toFixed(3);
+                        }
+                    }
+                    table += `<td>${value}</td>`;
+                });
+                table += '</tr>';
+            });
+            table += '</tbody>';
+
+            // Footer with total
+            table += '<tfoot><tr class="total-row">';
+            headerArray.forEach((h, index) => {
+                if (index === headerArray.length - 1) {
+                    table += `<td><strong>₹${sectionData.total.toLocaleString('en-IN')}</strong></td>`;
+                } else if (index === headerArray.length - 2) {
+                    table += '<td><strong>Total:</strong></td>';
+                } else {
+                    table += '<td></td>';
+                }
+            });
+            table += '</tr></tfoot>';
+
+            table += '</table></div>';
+            return table;
+        }
+
+        function goBack() {
+            document.getElementById('salaryCard').style.display = 'none';
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('message').innerHTML = '';
+        }
+
+        function showMessage(msg, type) {
+            document.getElementById('message').innerHTML = 
+                `<div class="alert alert-${type}">${msg}</div>`;
+            if (type === 'success') {
+                setTimeout(() => {
+                    document.getElementById('message').innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loading').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Enter key support
+        document.getElementById('pan').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyPAN();
+            }
+        });
+    </script>
+</body>
+</html>
