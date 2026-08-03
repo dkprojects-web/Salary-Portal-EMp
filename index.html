@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         :root {
@@ -26,15 +27,50 @@
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
 
+        /* Navigation */
+        .nav-bar {
+            background: rgba(26, 26, 46, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            border: 1px solid rgba(240, 165, 0, 0.3);
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            border: 2px solid var(--gold);
+            background: transparent;
+            color: var(--gold);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--gold);
+            color: #1a1a2e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(240, 165, 0, 0.3);
+        }
+
+        /* Cards */
         .container {
-            width: 100%;
-            max-width: 450px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .container-wide {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .card {
@@ -43,17 +79,18 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(240, 165, 0, 0.3);
             overflow: hidden;
+            margin-bottom: 30px;
         }
 
         .card-header {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 30px 20px;
+            padding: 25px;
             text-align: center;
             border-bottom: 2px solid var(--gold);
         }
 
         .card-header i {
-            font-size: 50px;
+            font-size: 40px;
             color: var(--gold);
             margin-bottom: 10px;
         }
@@ -67,23 +104,24 @@
         .card-header p {
             color: var(--gold);
             font-size: 14px;
-            margin: 0;
         }
 
         .card-body {
             padding: 25px;
         }
 
+        /* Form Elements */
         .form-label {
             color: #e0e0e0;
             font-weight: 600;
             margin-bottom: 8px;
             display: block;
+            font-size: 14px;
         }
 
         .form-control, .form-select {
             width: 100%;
-            padding: 12px 15px;
+            padding: 14px 15px;
             border-radius: 10px;
             border: 2px solid #2a2a4a;
             background: rgba(15, 15, 30, 0.8);
@@ -99,6 +137,16 @@
             box-shadow: 0 0 15px rgba(233, 69, 96, 0.3);
         }
 
+        .form-control::placeholder {
+            color: #666;
+        }
+
+        select.form-select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        /* Buttons */
         .btn {
             width: 100%;
             padding: 14px;
@@ -110,60 +158,96 @@
             border: none;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 10px;
         }
 
-        .btn-verify {
+        .btn-primary {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
 
-        .btn-verify:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-login {
+        .btn-success {
             background: linear-gradient(135deg, #f0a500, #e94560);
             color: white;
-            margin-top: 10px;
         }
 
-        .btn-login:hover {
+        .btn-success:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(233, 69, 96, 0.4);
         }
 
-        .btn-login:disabled {
+        .btn-success:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
 
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-outline:hover {
+            background: var(--gold);
+            color: #1a1a2e;
+            transform: translateY(-2px);
+        }
+
+        .btn-sm {
+            width: auto;
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-group .btn {
+            margin-bottom: 0;
+        }
+
+        /* Alerts */
         .alert {
-            padding: 12px;
+            padding: 12px 15px;
             border-radius: 10px;
             margin-bottom: 15px;
             font-weight: 500;
+            font-size: 14px;
         }
 
         .alert-success {
             background: rgba(0, 200, 83, 0.2);
             border: 1px solid #00c853;
-            color: #00c853;
+            color: #69f0ae;
         }
 
         .alert-danger {
             background: rgba(255, 23, 68, 0.2);
             border: 1px solid #ff1744;
-            color: #ff1744;
+            color: #ff6e81;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            color: #ffd54f;
         }
 
         .alert-info {
             background: rgba(0, 188, 212, 0.2);
             border: 1px solid #00bcd4;
-            color: #00bcd4;
+            color: #4dd0e1;
         }
 
+        /* Employee Info */
         .employee-info {
             background: rgba(240, 165, 0, 0.1);
             border: 1px solid var(--gold);
@@ -175,84 +259,114 @@
         .employee-info p {
             color: white;
             margin: 5px 0;
+            font-size: 14px;
         }
 
         .employee-info strong {
             color: var(--gold);
         }
 
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
         .salary-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            font-size: 13px;
         }
 
         .salary-table th {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 12px;
+            padding: 12px 10px;
             text-align: left;
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         .salary-table td {
-            padding: 10px 12px;
+            padding: 10px;
             border-bottom: 1px solid #2a2a4a;
             color: #e0e0e0;
+            white-space: nowrap;
         }
 
-        .salary-table tr:hover td {
+        .salary-table tbody tr:hover td {
             background: rgba(102, 126, 234, 0.1);
         }
 
         .total-row {
-            background: rgba(240, 165, 0, 0.1);
+            background: rgba(240, 165, 0, 0.15) !important;
             font-weight: 700;
+        }
+
+        .total-row td {
             color: var(--gold) !important;
-        }
-
-        .grand-total {
-            background: linear-gradient(135deg, #f0a500, #e94560);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 20px;
             font-weight: 700;
         }
 
-        .btn-back {
-            background: transparent;
-            border: 2px solid #667eea;
-            color: #667eea;
-            margin-top: 15px;
-        }
-
-        .btn-back:hover {
-            background: #667eea;
-            color: white;
+        .amount-cell {
+            color: var(--gold) !important;
+            font-weight: 600;
         }
 
         .section-title {
             color: var(--gold);
             font-size: 18px;
             font-weight: 700;
-            margin-top: 30px;
+            margin: 25px 0 10px 0;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--gold);
         }
 
-        .loading {
-            display: none;
-            text-align: center;
+        .grand-total {
+            background: linear-gradient(135deg, #f0a500, #e94560);
+            color: white;
             padding: 20px;
-            color: var(--gold);
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 25px;
+            font-size: 22px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
         }
 
-        .loading i {
-            font-size: 30px;
-            animation: spin 1s infinite;
+        /* Loading */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(240, 165, 0, 0.2);
+            border-top: 4px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: var(--gold);
+            margin-top: 20px;
+            font-size: 16px;
         }
 
         @keyframes spin {
@@ -260,97 +374,327 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Admin Panel */
+        .upload-area {
+            border: 2px dashed var(--gold);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(240, 165, 0, 0.05);
+        }
+
+        .upload-area:hover {
+            background: rgba(240, 165, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .upload-area i {
+            font-size: 40px;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #ccc;
+            margin: 5px 0;
+        }
+
+        .preview-section {
+            background: rgba(15, 15, 30, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #2a2a4a;
+        }
+
+        /* Print */
         @media print {
             body {
                 background: white !important;
+                padding: 0 !important;
             }
             .card {
                 box-shadow: none !important;
-                border: none !important;
+                border: 1px solid #000 !important;
+                background: white !important;
             }
-            .btn, .no-print {
+            .card-header {
+                background: #1a1a2e !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .salary-table th {
+                background: #667eea !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .salary-table td {
+                color: black !important;
+            }
+            .grand-total {
+                background: #f0a500 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .section-title {
+                color: #000 !important;
+                border-bottom-color: #000 !important;
+            }
+            .no-print, .nav-bar, .loading-overlay {
                 display: none !important;
+            }
+            .container-wide {
+                max-width: 100% !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .card-body {
+                padding: 15px;
+            }
+            .salary-table th, .salary-table td {
+                font-size: 11px;
+                padding: 6px 4px;
+            }
+            .grand-total {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Loading -->
-        <div class="loading" id="loading">
-            <i class="fas fa-spinner"></i>
-            <p id="loadingText">Loading...</p>
-        </div>
 
-        <!-- Login Screen -->
-        <div class="card" id="loginCard">
-            <div class="card-header">
-                <i class="fas fa-gem"></i>
-                <h3>Salary Slip Portal</h3>
-                <p>Diamond Enterprise</p>
-            </div>
-            <div class="card-body">
-                <div id="message"></div>
-                
-                <label class="form-label">Select Department</label>
-                <select id="dept" class="form-select">
-                    <option value="">-- Choose Department --</option>
-                </select>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text" id="loadingText">Loading...</p>
+    </div>
 
-                <label class="form-label">Enter PAN Number</label>
-                <input type="text" id="pan" class="form-control" 
-                       maxlength="10" placeholder="ABCDE1234F" autocomplete="off">
+    <!-- Navigation -->
+    <div class="nav-bar no-print">
+        <button class="nav-btn active" onclick="showPage('employee')" id="navEmployee">
+            <i class="fas fa-user"></i> Employee Portal
+        </button>
+        <button class="nav-btn" onclick="showPage('admin')" id="navAdmin">
+            <i class="fas fa-shield-alt"></i> Admin Panel
+        </button>
+    </div>
 
-                <button class="btn btn-verify" onclick="verifyPAN()">
-                    <i class="fas fa-search"></i> Verify PAN
-                </button>
-
-                <div id="verifiedSection" style="display:none;">
-                    <div class="employee-info" id="employeeInfo"></div>
+    <!-- ============ EMPLOYEE PORTAL ============ -->
+    <div id="employeePage">
+        <!-- Login Card -->
+        <div class="container" id="loginCard">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-gem"></i>
+                    <h3>Salary Slip Portal</h3>
+                    <p>Diamond Enterprise</p>
+                </div>
+                <div class="card-body">
+                    <div id="message"></div>
                     
-                    <label class="form-label">Select Month</label>
-                    <select id="month" class="form-select">
-                        <option value="">-- Choose Month --</option>
+                    <label class="form-label">
+                        <i class="fas fa-building"></i> Select Department
+                    </label>
+                    <select id="dept" class="form-select">
+                        <option value="">-- Choose Department --</option>
                     </select>
 
-                    <button class="btn btn-login" id="viewBtn" disabled onclick="viewSalary()">
-                        <i class="fas fa-eye"></i> View Salary Slip
+                    <label class="form-label">
+                        <i class="fas fa-id-card"></i> Enter PAN Number
+                    </label>
+                    <input type="text" id="pan" class="form-control" 
+                           maxlength="10" placeholder="ABCDE1234F" autocomplete="off">
+
+                    <button class="btn btn-primary" onclick="verifyPAN()">
+                        <i class="fas fa-search"></i> Verify PAN
                     </button>
+
+                    <div id="verifiedSection" style="display:none;">
+                        <div class="employee-info" id="employeeInfo"></div>
+                        
+                        <label class="form-label">
+                            <i class="fas fa-calendar"></i> Select Month
+                        </label>
+                        <select id="month" class="form-select">
+                            <option value="">-- Choose Month --</option>
+                        </select>
+
+                        <button class="btn btn-success" id="viewBtn" disabled onclick="viewSalary()">
+                            <i class="fas fa-eye"></i> View Salary Slip
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Salary View -->
-        <div id="salaryCard" style="display:none; width:100%; max-width:1000px;">
+        <!-- Salary Card -->
+        <div class="container-wide" id="salaryCard" style="display:none;">
             <div class="card">
                 <div class="card-header">
-                    <h3>📋 Salary Slip</h3>
+                    <h3><i class="fas fa-file-invoice"></i> Salary Slip</h3>
                     <p id="slipDate"></p>
                 </div>
                 <div class="card-body">
                     <div id="salaryContent"></div>
-                    <button class="btn btn-back no-print" onclick="goBack()">
-                        <i class="fas fa-arrow-left"></i> Back to Login
+                    <div class="btn-group no-print" style="margin-top:20px;">
+                        <button class="btn btn-outline btn-sm" onclick="goBack()">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="window.print()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="downloadPDF()">
+                            <i class="fas fa-download"></i> PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ADMIN PANEL ============ -->
+    <div id="adminPage" style="display:none;">
+        <div class="container-wide">
+            <!-- Admin Login -->
+            <div class="card" id="adminLoginCard">
+                <div class="card-header">
+                    <i class="fas fa-lock"></i>
+                    <h3>Admin Login</h3>
+                </div>
+                <div class="card-body">
+                    <div id="adminMessage"></div>
+                    
+                    <label class="form-label">Username</label>
+                    <input type="text" id="adminUsername" class="form-control" placeholder="Enter username">
+                    
+                    <label class="form-label">Password</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="Enter password">
+                    
+                    <button class="btn btn-primary" onclick="adminLogin()">
+                        <i class="fas fa-sign-in-alt"></i> Login
                     </button>
-                    <button class="btn btn-verify no-print" style="margin-top:10px;" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print Salary Slip
-                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div class="card" id="adminDashboard" style="display:none;">
+                <div class="card-header">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h3>Admin Dashboard</h3>
+                </div>
+                <div class="card-body">
+                    <h5 style="color:var(--gold); margin-bottom:20px;">
+                        <i class="fas fa-upload"></i> Upload Salary Data
+                    </h5>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+                        <div>
+                            <label class="form-label">Department</label>
+                            <select id="uploadDept" class="form-select">
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Sheet Type</label>
+                            <select id="uploadType" class="form-select">
+                                <option value="main">Main (Full Process)</option>
+                                <option value="uchak">Uchak Process</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="upload-area" onclick="document.getElementById('uploadFile').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p><strong>Click to Upload Excel/CSV File</strong></p>
+                        <p style="font-size:12px;">Supports: .xlsx, .xls, .csv</p>
+                        <input type="file" id="uploadFile" style="display:none;" 
+                               accept=".xlsx,.xls,.csv" onchange="previewFile()">
+                    </div>
+                    <p id="fileName" style="color:#ccc; text-align:center;"></p>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="previewData()">
+                            <i class="fas fa-eye"></i> Preview
+                        </button>
+                        <button class="btn btn-success" id="uploadBtn" disabled onclick="uploadData()">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload
+                        </button>
+                    </div>
+
+                    <div class="preview-section" id="previewSection" style="display:none;"></div>
+                    <div id="uploadMessage" style="margin-top:15px;"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // CONFIGURATION - Apna Supabase URL yahan dalen
+        // ============ CONFIGURATION ============
         const SUPABASE_URL = 'https://jeofxxumyoiaqggblggj.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_uDkMJr191UEjs__tahpHMw_ipl72MwZ';
         const API_URL = SUPABASE_URL + '/functions/v1/salary-api';
 
         let currentEmployee = null;
+        let salaryData = null;
+        let uploadFileData = null;
 
-        // Page load hone pe departments load karo
+        // ============ NAVIGATION ============
+        function showPage(page) {
+            document.getElementById('employeePage').style.display = page === 'employee' ? 'block' : 'none';
+            document.getElementById('adminPage').style.display = page === 'admin' ? 'block' : 'none';
+            
+            document.getElementById('navEmployee').classList.toggle('active', page === 'employee');
+            document.getElementById('navAdmin').classList.toggle('active', page === 'admin');
+            
+            if (page === 'admin') {
+                checkAdminSession();
+            }
+        }
+
+        // ============ LOADING ============
+        function showLoading(text = 'Loading...') {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // ============ MESSAGES ============
+        function showMessage(msg, type = 'danger') {
+            document.getElementById('message').innerHTML = 
+                `<div class="alert alert-${type}">${msg}</div>`;
+            if (type === 'success') {
+                setTimeout(() => document.getElementById('message').innerHTML = '', 5000);
+            }
+        }
+
+        function showAdminMessage(msg, type = 'danger') {
+            document.getElementById('adminMessage').innerHTML = 
+                `<div class="alert alert-${type}">${msg}</div>`;
+        }
+
+        function showUploadMessage(msg, type = 'info') {
+            document.getElementById('uploadMessage').innerHTML = 
+                `<div class="alert alert-${type}">${msg}</div>`;
+        }
+
+        // ============ INITIALIZATION ============
         window.onload = async function() {
-            showLoading('Loading departments...');
+            await loadDepartments();
+        };
+
+        async function loadDepartments() {
+            showLoading('Loading...');
             try {
                 const response = await fetch(API_URL + '/departments', {
                     method: 'POST',
@@ -359,38 +703,48 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    const deptSelect = document.getElementById('dept');
-                    data.departments.forEach(dept => {
-                        deptSelect.innerHTML += `<option value="${dept.code}">${dept.name || dept.code}</option>`;
+                    const selects = ['dept', 'uploadDept'];
+                    selects.forEach(id => {
+                        const sel = document.getElementById(id);
+                        if (sel) {
+                            sel.innerHTML = '<option value="">-- Choose --</option>';
+                            data.departments.forEach(dept => {
+                                sel.innerHTML += `<option value="${dept.code}">${dept.name || dept.code}</option>`;
+                            });
+                        }
                     });
                 }
                 hideLoading();
             } catch (error) {
                 hideLoading();
-                showMessage('Failed to load. Please refresh page.', 'danger');
+                console.error('Failed to load departments:', error);
             }
-        };
+        }
 
-        // PAN auto uppercase
-        document.getElementById('pan').addEventListener('input', function() {
+        // Auto uppercase PAN
+        document.getElementById('pan')?.addEventListener('input', function() {
             this.value = this.value.toUpperCase();
         });
 
-        // Verify PAN Button
+        // Enter key for PAN
+        document.getElementById('pan')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyPAN();
+        });
+
+        // Enable view button when month selected
+        document.getElementById('month')?.addEventListener('change', function() {
+            document.getElementById('viewBtn').disabled = !this.value;
+        });
+
+        // ============ VERIFY PAN ============
         async function verifyPAN() {
             const dept = document.getElementById('dept').value;
             const pan = document.getElementById('pan').value.trim();
 
-            if (!dept) {
-                showMessage('Please select department', 'danger');
-                return;
-            }
-            if (!pan || pan.length !== 10) {
-                showMessage('Please enter valid 10-digit PAN', 'danger');
-                return;
-            }
+            if (!dept) return showMessage('Please select department', 'warning');
+            if (!pan || pan.length !== 10) return showMessage('Please enter valid 10-digit PAN', 'warning');
 
-            showLoading('Verifying PAN...');
+            showLoading('Verifying...');
             
             try {
                 const response = await fetch(API_URL + '/verify-employee', {
@@ -401,12 +755,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    currentEmployee = {
-                        dept: dept,
-                        pan: pan,
-                        name: data.name,
-                        code: data.code
-                    };
+                    currentEmployee = { dept, pan, name: data.name, code: data.code };
 
                     document.getElementById('employeeInfo').innerHTML = `
                         <p><strong>👤 Name:</strong> ${data.name}</p>
@@ -432,12 +781,7 @@
             }
         }
 
-        // Enable view button when month selected
-        document.getElementById('month').addEventListener('change', function() {
-            document.getElementById('viewBtn').disabled = !this.value;
-        });
-
-        // View Salary Button
+        // ============ VIEW SALARY ============
         async function viewSalary() {
             const month = document.getElementById('month').value;
             if (!month || !currentEmployee) return;
@@ -457,6 +801,7 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    salaryData = data;
                     displaySalary(data);
                 } else {
                     showMessage('❌ ' + data.message, 'danger');
@@ -468,14 +813,13 @@
             }
         }
 
-        // Display Salary Slip
         function displaySalary(data) {
             document.getElementById('loginCard').style.display = 'none';
             document.getElementById('salaryCard').style.display = 'block';
             document.getElementById('slipDate').textContent = 'Generated: ' + data.employee.generatedAt;
 
             let html = `
-                <div class="employee-info">
+                <div class="employee-info" style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                     <p><strong>👤 Name:</strong> ${data.employee.name}</p>
                     <p><strong>🏢 Department:</strong> ${data.employee.department}</p>
                     <p><strong>💳 PAN:</strong> ${data.employee.pan}</p>
@@ -484,19 +828,16 @@
                 </div>
             `;
 
-            // Main Section
             if (data.main.rows && data.main.rows.length > 0) {
                 html += `<h4 class="section-title">📋 Full Process (Main)</h4>`;
                 html += buildTable(data.main);
             }
 
-            // Uchak Section
             if (data.uchak.rows && data.uchak.rows.length > 0) {
                 html += `<h4 class="section-title">📋 Uchak Process</h4>`;
                 html += buildTable(data.uchak);
             }
 
-            // Grand Total
             html += `
                 <div class="grand-total">
                     💰 Grand Total: ₹${data.grandTotal.toLocaleString('en-IN')}
@@ -508,47 +849,49 @@
         }
 
         function buildTable(sectionData) {
-            if (!sectionData.rows || sectionData.rows.length === 0) return '<p>No records</p>';
+            if (!sectionData.rows || sectionData.rows.length === 0) {
+                return '<p style="color:#ccc;">No records found</p>';
+            }
 
-            // Get all column headers
             const headers = new Set();
             sectionData.rows.forEach(row => {
                 Object.keys(row).forEach(key => {
-                    if (!key.startsWith('_') && key !== 'month') {
-                        headers.add(key);
-                    }
+                    if (!key.startsWith('_') && key !== 'month') headers.add(key);
                 });
             });
 
             const headerArray = Array.from(headers);
 
-            let table = '<div style="overflow-x:auto;"><table class="salary-table">';
+            let table = '<div class="table-responsive"><table class="salary-table">';
             
-            // Header
             table += '<thead><tr>';
             headerArray.forEach(h => table += `<th>${h}</th>`);
             table += '</tr></thead>';
 
-            // Body
             table += '<tbody>';
             sectionData.rows.forEach(row => {
                 table += '<tr>';
                 headerArray.forEach(h => {
-                    let value = row[h] || '-';
-                    if (typeof value === 'number') {
-                        if (h.toLowerCase().includes('amount') || h.toLowerCase().includes('rate')) {
+                    let value = row[h];
+                    if (value === null || value === undefined || value === '') {
+                        value = '-';
+                    } else if (typeof value === 'number') {
+                        const hLower = h.toLowerCase();
+                        if (hLower.includes('amount') || hLower.includes('rate')) {
                             value = '₹' + value.toLocaleString('en-IN');
-                        } else if (h.toLowerCase().includes('carat')) {
+                        } else if (hLower.includes('carat')) {
                             value = value.toFixed(3);
+                        } else if (hLower.includes('pcs')) {
+                            value = value.toLocaleString('en-IN');
                         }
                     }
-                    table += `<td>${value}</td>`;
+                    const isAmount = h.toLowerCase().includes('amount') || h.toLowerCase().includes('rate');
+                    table += `<td class="${isAmount ? 'amount-cell' : ''}">${value}</td>`;
                 });
                 table += '</tr>';
             });
             table += '</tbody>';
 
-            // Footer with total
             table += '<tfoot><tr class="total-row">';
             headerArray.forEach((h, index) => {
                 if (index === headerArray.length - 1) {
@@ -569,33 +912,179 @@
             document.getElementById('salaryCard').style.display = 'none';
             document.getElementById('loginCard').style.display = 'block';
             document.getElementById('message').innerHTML = '';
+            window.scrollTo(0, 0);
         }
 
-        function showMessage(msg, type) {
-            document.getElementById('message').innerHTML = 
-                `<div class="alert alert-${type}">${msg}</div>`;
-            if (type === 'success') {
-                setTimeout(() => {
-                    document.getElementById('message').innerHTML = '';
-                }, 5000);
+        async function downloadPDF() {
+            if (!salaryData) return;
+            showLoading('Generating PDF...');
+            
+            try {
+                const element = document.getElementById('salaryContent');
+                const canvas = await html2canvas(element, { 
+                    scale: 2, 
+                    backgroundColor: '#ffffff',
+                    useCORS: true
+                });
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('landscape', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height) * 0.95;
+                
+                pdf.addImage(
+                    canvas.toDataURL('image/jpeg', 1.0), 
+                    'JPEG', 
+                    (pdfWidth - canvas.width * ratio) / 2, 
+                    5, 
+                    canvas.width * ratio, 
+                    canvas.height * ratio
+                );
+                
+                pdf.save(`SalarySlip_${currentEmployee.name}_${currentEmployee.pan}.pdf`);
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                alert('PDF generation failed. Please try printing instead.');
             }
         }
 
-        function showLoading(text) {
-            document.getElementById('loadingText').textContent = text;
-            document.getElementById('loading').style.display = 'block';
-        }
-
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        // Enter key support
-        document.getElementById('pan').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                verifyPAN();
+        // ============ ADMIN FUNCTIONS ============
+        function checkAdminSession() {
+            const token = sessionStorage.getItem('adminToken');
+            if (token) {
+                document.getElementById('adminLoginCard').style.display = 'none';
+                document.getElementById('adminDashboard').style.display = 'block';
             }
-        });
+        }
+
+        async function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (!username || !password) {
+                return showAdminMessage('Please enter username and password', 'warning');
+            }
+
+            showLoading('Logging in...');
+            
+            try {
+                const response = await fetch(API_URL + '/admin-login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('adminToken', data.token);
+                    document.getElementById('adminLoginCard').style.display = 'none';
+                    document.getElementById('adminDashboard').style.display = 'block';
+                    showAdminMessage('✅ Login successful!', 'success');
+                } else {
+                    showAdminMessage('❌ ' + data.message, 'danger');
+                }
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showAdminMessage('Network error. Please try again.', 'danger');
+            }
+        }
+
+        function previewFile() {
+            const file = document.getElementById('uploadFile').files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = '📄 ' + file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const workbook = XLSX.read(e.target.result, {type: 'binary'});
+                        const firstSheet = workbook.SheetNames[0];
+                        uploadFileData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                        document.getElementById('uploadBtn').disabled = false;
+                        showUploadMessage(`✅ File loaded! ${uploadFileData.length} records found.`, 'success');
+                    } catch (error) {
+                        showUploadMessage('❌ Error reading file: ' + error.message, 'danger');
+                    }
+                };
+                reader.readAsBinaryString(file);
+            }
+        }
+
+        function previewData() {
+            if (!uploadFileData) {
+                return showUploadMessage('Please select a file first', 'warning');
+            }
+
+            const previewRows = uploadFileData.slice(0, 10);
+            let html = '<h6 style="color:var(--gold);">Preview (First 10 rows)</h6>';
+            html += '<div class="table-responsive"><table class="salary-table"><thead><tr>';
+            
+            Object.keys(previewRows[0]).forEach(key => {
+                html += `<th>${key}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            previewRows.forEach(row => {
+                html += '<tr>';
+                Object.values(row).forEach(val => {
+                    html += `<td>${val || '-'}</td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+            html += `<p style="color:#ccc; margin-top:10px;">Total: ${uploadFileData.length} records</p>`;
+            
+            document.getElementById('previewSection').innerHTML = html;
+            document.getElementById('previewSection').style.display = 'block';
+        }
+
+        async function uploadData() {
+            if (!uploadFileData) return;
+            
+            const dept = document.getElementById('uploadDept').value;
+            const type = document.getElementById('uploadType').value;
+            const token = sessionStorage.getItem('adminToken');
+
+            if (!dept) return showUploadMessage('Please select department', 'warning');
+            if (!token) return showUploadMessage('Please login first', 'warning');
+
+            showLoading('Uploading data...');
+            
+            try {
+                const response = await fetch(API_URL + '/upload-salary', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        token,
+                        department: dept,
+                        sheetType: type,
+                        data: uploadFileData
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showUploadMessage(
+                        `✅ Success! Processed: ${data.processed}, Inserted: ${data.inserted}`, 
+                        'success'
+                    );
+                    document.getElementById('uploadFile').value = '';
+                    document.getElementById('fileName').textContent = '';
+                    document.getElementById('uploadBtn').disabled = true;
+                    document.getElementById('previewSection').style.display = 'none';
+                    uploadFileData = null;
+                } else {
+                    showUploadMessage('❌ ' + (data.message || 'Upload failed'), 'danger');
+                }
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showUploadMessage('Network error. Please try again.', 'danger');
+            }
+        }
     </script>
 </body>
 </html>
