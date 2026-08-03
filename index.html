@@ -960,12 +960,18 @@
         }
 
         async function adminLogin() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
+    const username = document.getElementById('adminUsername').value;
+    const password = document.getElementById('adminPassword').value;
 
-            if (!username || !password) {
-                return showAdminMessage('Please enter username and password', 'warning');
-            }
+    // TEMPORARY: Direct check (baad mein change karna)
+    if (username === 'admin' && password === 'admin123') {
+        sessionStorage.setItem('adminToken', 'temporary_token');
+        document.getElementById('adminLoginCard').style.display = 'none';
+        document.getElementById('adminDashboard').style.display = 'block';
+        showAdminMessage('✅ Login successful!', 'success');
+        return;
+    }
+
 
             showLoading('Logging in...');
             
